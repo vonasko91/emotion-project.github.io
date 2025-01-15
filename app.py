@@ -36,12 +36,14 @@ def action():
     if captured_emotions:
         dominant_emotion, emotion_score = emo_detector.top_emotion(image_one)
         os.remove(image_path)  # Удаляем временный файл
-        return jsonify(message=f"Доминирующая эмоция: {dominant_emotion}, Оценка: {emotion_score}")
+        return jsonify(message=f"Доминирующая эмоция: {dominant_emotion}, Оценка: {emotion_score:.2f}")
     else:
         os.remove(image_path)  # Удаляем временный файл
         return jsonify(message="Эмоции не обнаружены!")
 
 if __name__ == '__main__':
+    app.run(debug=True)
+
 
 
 
