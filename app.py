@@ -3,6 +3,67 @@ import cv2
 from fer import FER
 import os
 
+@app.route('/action', methods=['POST'])
+def action():
+    print("Запрос получен")  # Логируем получение запроса
+    if 'image' not in request.files:
+        print("Нет изображения!")
+        return jsonify(message="Нет изображения!")
+
+    file = request.files['image']
+    print(f"Получен файл: {file.filename}")  # Логируем имя файла
+
+    if file.filename == '':
+        print("Файл не выбран!")
+        return jsonify(message="Файл не выбран!")
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/action', methods=['POST'])
+def action():
+    # Проверяем наличие файла изображения в запросе
+    if 'image' not in request.files:
+        return jsonify(message="Нет изображения!")
+
+    file = request.files['image']
+
+    if file.filename == '':
+        return jsonify(message="Файл не выбран!")
+
+    # Проверяем и создаем папку temp, если она не существует
+    if not os.path.exists('temp'):
+        os.makedirs('temp')
+
+    # Сохраняем изображение во временный файл
+    image_path = os.path.join('temp', file.filename)
+    file.save(image_path)
+
+    # Загружаем изображение и анализируем эмоции
+    image_one = cv2.imread(image_path)
+    emo_detector = FER(mtcnn=True)
+    captured_emotions = emo_detector.detect_emotions(image_one)
+
+    if captured_emotions:
+        dominant_emotion, emotion_score = emo_detector.top_emotion(image_one)
+        os.remove(image_path)  # Удаляем временный файл
+        return jsonify(message=f"Доминирующая эмоция: {dominant_emotion}, Оценка: {emotion_score:.2f}")
+    else:
+        os.remove(image_path)  # Удаляем временный файл
+        return jsonify(message="Эмоции не обнаружены!")
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+
+
+
+
 app = Flask(__name__)
 
 @app.route('/')
