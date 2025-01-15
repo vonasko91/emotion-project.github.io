@@ -88,20 +88,15 @@
                 body: formData,
             });
 
-            if (response.ok) {
-                const result = await response.json();
-                resultDiv.innerText = result.message;
-                resultDiv.classList.remove('hidden');
-                resultDiv.classList.add('visible');
-            } else {
-                resultDiv.innerText = "Ошибка при обработке изображения.";
-                resultDiv.classList.remove('hidden');
-                resultDiv.classList.add('visible');
-            }
+            const data = await response.json();
+            resultDiv.textContent = data.message;
+            resultDiv.classList.remove('hidden');
+            resultDiv.classList.add('visible');
         };
     </script>
 </body>
 </html>
+
 
 
 
