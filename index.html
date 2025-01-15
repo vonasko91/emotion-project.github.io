@@ -48,6 +48,9 @@
             font-size: 18px;
             color: #333;
         }
+        .visually-hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -56,22 +59,32 @@
         <form action="/action" method="post" enctype="multipart/form-data">
             <input type="file" name="image" accept="image/*" required>
             <button type="submit">Отправить</button>
+            <div class="visually-hidden" id="loading">Загрузка...</div>
         </form>
         <div id="result"></div>
     </div>
 
     <script>
         const form = document.querySelector('form');
+        const result = document.getElementById('result');
+        const loading = document.getElementById('loading');
+
         form.onsubmit = async (e) => {
             e.preventDefault();
+            toggleVisuallyHidden(loading, true);
             const formData = new FormData(form);
             const response = await fetch('/action', {
                 method: 'POST',
                 body: formData,
             });
-            const result = await response.json();
-            document.getElementById('result').innerText = result.message;
+            toggleVisuallyHidden(loading, false);
+            const data = await response.json();
+            result.innerText = data.message;
         };
+
+        function toggleVisuallyHidden(element, remove) {
+            remove ? element.classList.remove('visually-hidden') : element.classList.add('visually-hidden');
+        }
     </script>
 </body>
 </html>
